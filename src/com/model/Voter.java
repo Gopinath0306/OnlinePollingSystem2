@@ -108,7 +108,7 @@ public class Voter {
         this.mobileNumber = mobileNumber;
     }
 
-  
+
     @Override
     public String toString() {
         return "\n  Voter ID      : " + voterId

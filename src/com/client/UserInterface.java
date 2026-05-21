@@ -183,12 +183,15 @@ public class UserInterface {
 
         System.out.print("  Enter Voter ID        : ");
         String voterId = scanner.nextLine().trim();
-
-        System.out.print("  Enter New Mobile No.  : ");
-        long mobile = scanner.nextLong();
-        scanner.nextLine();
+        
+       
 
         try {
+        	 Voter voter = voterService.searchVoterById(voterId);
+        	 System.out.println(voter);
+        	 System.out.print("  Enter New Mobile No.  : ");
+             long mobile = scanner.nextLong();
+             scanner.nextLine();
             voterService.updateMobileNumber(voterId, mobile);
             ApplicationUtil.printSuccess("Mobile number updated successfully for Voter ID: " + voterId);
         } catch (InvalidVoterException e) {
@@ -206,10 +209,13 @@ public class UserInterface {
         System.out.print("  Enter Voter ID   : ");
         String voterId = scanner.nextLine().trim();
 
-        System.out.print("  Enter New Address: ");
-        String address = scanner.nextLine().trim();
+        
 
         try {
+        	Voter voter = voterService.searchVoterById(voterId);
+       	    System.out.println(voter);
+        	System.out.print("  Enter New Address: ");
+            String address = scanner.nextLine().trim();
             voterService.updateAddress(voterId, address);
             ApplicationUtil.printSuccess("Address updated successfully for Voter ID: " + voterId);
         } catch (InvalidVoterException e) {
@@ -378,10 +384,11 @@ public class UserInterface {
         int nomineeId =scanner.nextInt();
         scanner.nextLine();
 
-        System.out.print("  Enter New Address    : ");
-        String address = scanner.nextLine().trim();
-
         try {
+        	Nominee nominee = nomineeService.searchNomineeById(nomineeId);
+        	System.out.println(nominee);
+        	 System.out.print("  Enter New Address    : ");
+             String address = scanner.nextLine().trim();
             nomineeService.updateNomineeAddress(nomineeId, address);
             ApplicationUtil.printSuccess("Address updated for Nominee ID: " + nomineeId);
         } catch (IllegalArgumentException e) {
@@ -433,8 +440,10 @@ public class UserInterface {
         }
 
         try {
+        	Nominee nominee = nomineeService.searchNomineeById(nomineeId);
             nomineeService.deleteNominee(nomineeId);
             ApplicationUtil.printSuccess("Nominee ID " + nomineeId + " deleted successfully.");
+            System.out.println(nominee);
         } catch (IllegalArgumentException e) {
             ApplicationUtil.printError(e.getMessage());
         } catch (SQLException e) {
