@@ -1,34 +1,22 @@
 package com.model;
 
-/**
- * Model class representing a Nominee entity.
- * Maps to the 'nominee' table in the database.
- *
- * @author Senior Java Developer
- * @version 1.0
- */
+
 public class Nominee {
 
-    // -------------------------------------------------------
-    // Fields (mapped to DB columns)
-    // -------------------------------------------------------
-    private int    nomineeId;    // nominee_id   INT PK
-    private String nomineeName;  // nominee_name VARCHAR(25)
-    private String constitution; // constitution VARCHAR(30)
-    private String district;     // district     VARCHAR(50)
-    private String symbol;       // symbol       VARCHAR(50)  (party symbol)
-    private String address;      // address      VARCHAR(100)
-    private int    voteCount;    // vote_count   INT
+   
+    private int    nomineeId;    
+    private String nomineeName;  
+    private String constitution; 
+    private String district;     
+    private String symbol;       
+    private String address;      
+    private int    voteCount;    
 
-    // -------------------------------------------------------
-    // Default Constructor
-    // -------------------------------------------------------
+   
     public Nominee() {
     }
 
-    // -------------------------------------------------------
-    // Parameterized Constructor
-    // -------------------------------------------------------
+    
     public Nominee(int nomineeId, String nomineeName, String constitution,
                    String district, String symbol, String address, int voteCount) {
         this.nomineeId    = nomineeId;
@@ -40,9 +28,7 @@ public class Nominee {
         this.voteCount    = voteCount;
     }
 
-    // -------------------------------------------------------
-    // Getters and Setters
-    // -------------------------------------------------------
+    
     public int getNomineeId() {
         return nomineeId;
     }
@@ -99,9 +85,7 @@ public class Nominee {
         this.voteCount = voteCount;
     }
 
-    // -------------------------------------------------------
-    // toString – for display purposes
-    // -------------------------------------------------------
+   
     @Override
     public String toString() {
         return "\n  Nominee ID    : " + nomineeId

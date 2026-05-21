@@ -11,11 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class NomineeManagement {
 
     
-    private final Connection connection;
+    private Connection connection;
 
     public NomineeManagement(Connection connection) {
         this.connection = connection;
@@ -41,6 +40,8 @@ public class NomineeManagement {
             }
         }
     }
+    
+    
 
    
     public void updateNomineeAddress(int nomineeId, String address) throws SQLException {
@@ -75,26 +76,7 @@ public class NomineeManagement {
         }
         return nominee;
     }
-
-   
-   
-
-   
-    public List<Nominee> getAllNominees() throws SQLException {
-        String sql = "SELECT * FROM nominee ORDER BY district, vote_count DESC";
-        List<Nominee> nominees = new ArrayList<>();
-
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                nominees.add(mapResultSetToNominee(rs));
-            }
-        }
-        return nominees;
-    }
-
-   
-   
+  
     public void deleteNominee(int nomineeId) throws SQLException {
         String sql = "DELETE FROM nominee WHERE nominee_id = ?";
 
@@ -109,6 +91,20 @@ public class NomineeManagement {
     }
 
   
+    
+    public List<Nominee> getAllNominees() throws SQLException {
+        String sql = "SELECT * FROM nominee ORDER BY district, vote_count DESC";
+        List<Nominee> nominees = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                nominees.add(mapResultSetToNominee(rs));
+            }
+        }
+        return nominees;
+    }
+    
     private Nominee mapResultSetToNominee(ResultSet rs) throws SQLException {
         Nominee nominee = new Nominee();
         nominee.setNomineeId(rs.getInt("nominee_id"));
@@ -121,7 +117,35 @@ public class NomineeManagement {
         return nominee;
     }
     
+    public List<Nominee> getNomineesByDistrict(String district) throws SQLException {
+        String sql = "SELECT * FROM nominee WHERE district = ? ORDER BY vote_count DESC, nominee_name";
+        List<Nominee> nominees = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, district);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    nominees.add(mapResultSetToNominee(rs));
+                }
+            }
+        }
+        return nominees;
+    }
     
+    public Map<String, Integer> getPartyWiseVoteCount() throws SQLException {
+        String sql = "SELECT symbol, SUM(vote_count) AS total_votes "
+                   + "FROM nominee GROUP BY symbol ORDER BY total_votes DESC";
+        Map<String, Integer> partyVotes = new HashMap<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                partyVotes.put(rs.getString("symbol"), rs.getInt("total_votes"));
+            }
+        }
+        return partyVotes;
+    }
     
     
     

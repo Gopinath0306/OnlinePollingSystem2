@@ -13,7 +13,6 @@ import java.util.List;
 
 public class VoterManagement {
 
-    // Active JDBC connection injected via constructor
     private final Connection connection;
 
     

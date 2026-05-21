@@ -28,28 +28,26 @@ public class UserInterface {
     
     private static VoterService   voterService;
     private static NomineeService nomineeService;
-   
-
-
+    private static VoteService    voteService;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
 
    
     public static void main(String[] args) {
-        
+       
        
         try {
            
             voterService   = new VoterService();
             nomineeService =new NomineeService();
+            voteService    = new VoteService();
             displayMainMenu();
 
         } catch (SQLException e) {
-            ApplicationUtil.printError("Cannot connect to database: " + e.getMessage());
+            ApplicationUtil.printError(e.getMessage());
             
         } finally {
            
             DBConnectionManager.closeConnection();
-            scanner.close();
             System.out.println("\n  System shutdown complete. Goodbye!");
         }
     }
@@ -59,25 +57,36 @@ public class UserInterface {
         int choice;
         do {
             System.out.println();
+            
             ApplicationUtil.printSeparator();
             System.out.println("           ONLINE POLLING SYSTEM - MAIN MENU");
             ApplicationUtil.printSeparator();
             System.out.println("  1. Voter Module");
             System.out.println("  2. Nominee Module");
-            System.out.println("  3. Exit");
+            System.out.println("  3. Vote Module");
+            System.out.println("  4. Result Module");
+            System.out.println("  5. Exit");
             ApplicationUtil.printSeparator();
             System.out.print("  Enter your choice: ");
 
+           
             choice = scanner.nextInt();
             scanner.nextLine();
 
             switch (choice) {
-                case 1: displayVoterMenu();   break;
-                case 2: displayNomineeMenu(); break;
-                case 3: System.out.println("\n  Returning to exit...");  break;
-                default: ApplicationUtil.printError("Invalid option. Please enter 1–3.");
+                case 1: displayVoterMenu();   
+                        break;
+                case 2: displayNomineeMenu(); 
+                        break;
+                case 3:displayVoteMenu();
+                       break;
+                case 4: displayResultMenu();  
+                   break;
+                case 5: System.out.println("\n  Returning to exit..."); 
+                       break;
+                default: ApplicationUtil.printError("Invalid option. Please enter 1–5.");
             }
-        } while (choice != 3);
+        } while (choice != 5);
     }
 
     
@@ -98,17 +107,25 @@ public class UserInterface {
             ApplicationUtil.printSeparator();
             System.out.print("  Enter your choice: ");
 
+            
             choice = scanner.nextInt();
             scanner.nextLine();
 
             switch (choice) {
-                case 1: handleAddVoter();               break;
-                case 2: handleUpdateMobileNumber();     break;
-                case 3: handleUpdateAddress();          break;
-                case 4: handleSearchVoterById();        break;
-                case 5: handleViewVotersByDistrict();   break;
-                case 6: handleDeleteVoter();            break;
-                case 7: System.out.println("  Returning to main menu..."); break;
+                case 1: handleAddVoter();              
+                        break;
+                case 2: handleUpdateMobileNumber();    
+                        break;
+                case 3: handleUpdateAddress();          
+                       break;
+                case 4: handleSearchVoterById();        
+                       break;
+                case 5: handleViewVotersByDistrict();  
+                      break;
+                case 6: handleDeleteVoter();           
+                      break;
+                case 7: System.out.println("  Returning to main menu..."); 
+                       break;
                 default: ApplicationUtil.printError("Invalid option. Please enter 1–7.");
             }
         } while (choice != 7);
@@ -221,7 +238,7 @@ public class UserInterface {
         } catch (InvalidVoterException e) {
             ApplicationUtil.printError(e.getMessage());
         } catch (SQLException e) {
-            ApplicationUtil.printError("Database error: " + e.getMessage());
+            ApplicationUtil.printError( e.getMessage());
         }
     }
 
@@ -272,7 +289,7 @@ public class UserInterface {
         } catch (InvalidVoterException e) {
             ApplicationUtil.printError(e.getMessage());
         } catch (SQLException e) {
-            ApplicationUtil.printError("Database error: " + e.getMessage());
+            ApplicationUtil.printError( e.getMessage());
         }
     }
 
@@ -298,11 +315,16 @@ public class UserInterface {
             scanner.nextLine();
 
             switch (choice) {
-                case 1: handleAddNominee();              break;
-                case 2: handleUpdateNomineeAddress();    break;
-                case 3: handleSearchNomineeById();       break;
-                case 4: handleDeleteNominee();           break;
-                case 5: System.out.println("  Returning to main menu..."); break;
+                case 1: handleAddNominee();             
+                       break;
+                case 2: handleUpdateNomineeAddress();   
+                       break;
+                case 3: handleSearchNomineeById();      
+                      break;
+                case 4: handleDeleteNominee();          
+                      break;
+                case 5: System.out.println("  Returning to main menu...");
+                     break;
                 default: ApplicationUtil.printError("Invalid option. Please enter 1–5.");
             }
         } while (choice != 5);
@@ -413,7 +435,260 @@ public class UserInterface {
             ApplicationUtil.printError("Database error: " + e.getMessage());
         }
     }
+    
+    
+    // vote module
+    private static void displayVoteMenu() {
+        int choice;
+        do {
+            System.out.println();
+            ApplicationUtil.printSeparator();
+            System.out.println("               VOTE MODULE");
+            ApplicationUtil.printSeparator();
+            System.out.println("  1. Login and Cast Vote");
+            System.out.println("  2. Back to Main Menu");
+            ApplicationUtil.printSeparator();
+            System.out.print("  Enter your choice: ");
+
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1: handleLoginAndCastVote(); break;
+                case 2: System.out.println("  Returning to main menu..."); break;
+                default: ApplicationUtil.printError("Invalid option. Please enter 1 or 2.");
+            }
+        } while (choice != 2);
+    }
+    
+    private static void handleLoginAndCastVote() {
+        System.out.println();
+        ApplicationUtil.printBanner("VOTER LOGIN");
+
+        System.out.print("  Enter Login ID  : ");
+        String loginId = scanner.nextLine().trim();
+
+        System.out.print("  Enter Password  : ");
+        String password = scanner.nextLine().trim();
+
+        Voter voter;
+        try {
+            voter = voteService.authenticateVoter(loginId, password);
+        } catch (InvalidVoterException e) {
+            ApplicationUtil.printError(e.getMessage());
+            return;
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Database error during login: " + e.getMessage());
+            return;
+        }
+
+       
+        ApplicationUtil.printSuccess("Login successful! Welcome, " + voter.getVoterName() + ".");
+        System.out.println("  Voter ID : " + voter.getVoterId());
+        System.out.println("  District : " + voter.getDistrict());
+
+       
+        try {
+            if (voteService.hasVoterAlreadyVoted(voter.getVoterId())) {
+                ApplicationUtil.printError("You have already cast your vote. Each voter may vote only once.");
+                return;
+            }
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Error checking vote status: " + e.getMessage());
+            return;
+        }
+
+       
+        System.out.println();
+        ApplicationUtil.printBanner("NOMINEES IN YOUR DISTRICT: " + voter.getDistrict());
+
+        List<Nominee> nominees;
+        try {
+            nominees = nomineeService.getNomineesByDistrict(voter.getDistrict());
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Error loading nominees: " + e.getMessage());
+            return;
+        }
+
+        if (nominees.isEmpty()) {
+            ApplicationUtil.printInfo("No nominees are registered for district: " + voter.getDistrict());
+            return;
+        }
+
+       
+        System.out.println();
+        System.out.printf("  %-5s %-10s %-20s %-15s %-15s%n",
+                          "No.", "ID", "Name", "Constitution", "Symbol");
+        ApplicationUtil.printDivider();
+        for (int i = 0; i < nominees.size(); i++) {
+            Nominee n = nominees.get(i);
+            System.out.printf("  %-5d %-10d %-20s %-15s %-15s%n",
+                              (i + 1), n.getNomineeId(), n.getNomineeName(),
+                              n.getConstitution(), n.getSymbol());
+        }
+        ApplicationUtil.printDivider();
+
+    
+        System.out.print("  Enter Nominee ID to cast your vote: ");
+        int nomineeId = scanner.nextInt();
+        scanner.nextLine();
+
+        
+        System.out.print("  Confirm your vote for Nominee ID " + nomineeId + "? (yes/no): ");
+        String confirm = scanner.nextLine().trim();
+
+        if (!"yes".equalsIgnoreCase(confirm)) {
+            ApplicationUtil.printInfo("Vote cancelled. You may try again.");
+            return;
+        }
+
+        
+        try {
+            Vote vote = voteService.castVote(voter, nomineeId);
+            System.out.println();
+            ApplicationUtil.printSuccess("Vote cast successfully!");
+            ApplicationUtil.printDivider();
+            System.out.println("  Vote ID      : " + vote.getVoteId());
+            System.out.println("  Voter        : " + voter.getVoterName() + " (" + voter.getVoterId() + ")");
+            System.out.println("  Nominee ID   : " + vote.getNomineeId());
+            System.out.println("  Date         : " + vote.getVotedDate());
+            ApplicationUtil.printDivider();
+            ApplicationUtil.printInfo("Thank you for exercising your democratic right!");
+        } catch (InvalidVoterException e) {
+            ApplicationUtil.printError(e.getMessage());
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Database error while casting vote: " + e.getMessage());
+        }
+    }
+    
+    
+    //Result module
+    private static void displayResultMenu() {
+        int choice;
+        do {
+            System.out.println();
+            ApplicationUtil.printSeparator();
+            System.out.println("               RESULT MODULE");
+            ApplicationUtil.printSeparator();
+            System.out.println("  1. Voting Percentage By District");
+            System.out.println("  2. Party Wise Vote Count");
+            System.out.println("  3. District Wise Nominee List");
+            System.out.println("  4. Back to Main Menu");
+            ApplicationUtil.printSeparator();
+            System.out.print("  Enter your choice: ");
+
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1: handleDistrictVotingPercentage(); break;
+                case 2: handlePartyWiseVoteCount();       break;
+                case 3: handleDistrictWiseNomineeList();  break;
+                case 4: System.out.println("  Returning to main menu..."); break;
+                default: ApplicationUtil.printError("Invalid option. Please enter 1–4.");
+            }
+        } while (choice != 4);
+    }
    
+    private static void handleDistrictVotingPercentage() {
+        System.out.println();
+        ApplicationUtil.printBanner("VOTING PERCENTAGE BY DISTRICT");
+
+        try {
+            Map<String, int[]> details     = voteService.getDistrictVotingDetails();
+            Map<String, Double> percentage = voteService.getDistrictVotingPercentage();
+
+            if (details.isEmpty()) {
+                ApplicationUtil.printInfo("No voting data available yet.");
+                return;
+            }
+
+            System.out.printf("%n  %-20s %-15s %-15s %-15s%n",
+                              "District", "Total Voters", "Votes Cast", "Percentage");
+            ApplicationUtil.printDivider();
+
+            for (Map.Entry<String, int[]> entry : details.entrySet()) {
+                String district  = entry.getKey();
+                int totalVoters  = entry.getValue()[0];
+                int votesCast    = entry.getValue()[1];
+                double pct       = percentage.getOrDefault(district, 0.0);
+
+                System.out.printf("  %-20s %-15d %-15d %-15.2f%%%n",
+                                  district, totalVoters, votesCast, pct);
+            }
+            ApplicationUtil.printDivider();
+            System.out.println("  Total Votes Cast in System: " + voteService.getTotalVotesCast());
+
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Database error: " + e.getMessage());
+        }
+    }
+    
+    private static void handlePartyWiseVoteCount() {
+        System.out.println();
+        ApplicationUtil.printBanner("PARTY WISE VOTE COUNT");
+
+        try {
+            Map<String, Integer> partyVotes = nomineeService.getPartyWiseVoteCount();
+
+            if (partyVotes.isEmpty()) {
+                ApplicationUtil.printInfo("No vote data available.");
+                return;
+            }
+
+            System.out.printf("%n  %-25s %-15s%n", "Party Symbol", "Total Votes");
+            ApplicationUtil.printDivider();
+
+            
+            partyVotes.entrySet()
+                      .stream()
+                      .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                      .forEach(entry ->
+                          System.out.printf("  %-25s %-15d%n",
+                                            entry.getKey(), entry.getValue()));
+
+            ApplicationUtil.printDivider();
+
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Database error: " + e.getMessage());
+        }
+    }
+    
+    private static void handleDistrictWiseNomineeList() {
+        System.out.println();
+        ApplicationUtil.printBanner("DISTRICT WISE NOMINEE LIST");
+
+        try {
+            List<Nominee> nominees = nomineeService.getAllNominees();
+
+            if (nominees.isEmpty()) {
+                ApplicationUtil.printInfo("No nominees registered in the system.");
+                return;
+            }
+
+            String currentDistrict = "";
+            for (Nominee n : nominees) {
+                // Print district header when it changes
+                if (!n.getDistrict().equals(currentDistrict)) {
+                    currentDistrict = n.getDistrict();
+                    System.out.println();
+                    System.out.println("  District: " + currentDistrict.toUpperCase());
+                    ApplicationUtil.printDivider();
+                    System.out.printf("  %-10s %-20s %-15s %-12s %-10s%n",
+                                     "ID", "Name", "Constitution", "Symbol", "Votes");
+                    ApplicationUtil.printDivider();
+                }
+                System.out.printf("  %-10d %-20s %-15s %-12s %-10d%n",
+                                  n.getNomineeId(), n.getNomineeName(),
+                                  n.getConstitution(), n.getSymbol(), n.getVoteCount());
+            }
+            ApplicationUtil.printDivider();
+
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Database error: " + e.getMessage());
+        }
+    }
+    
     private static Date parseDate(String dateStr) {
         DATE_FORMAT.setLenient(false);
         try {

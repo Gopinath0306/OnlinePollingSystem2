@@ -8,7 +8,7 @@ import com.util.ApplicationUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-
+import java.util.Map;
 
 
 public class NomineeService {
@@ -87,7 +87,15 @@ public class NomineeService {
         return nomineeManagement.getAllNominees();
     }
 
+    public List<Nominee> getNomineesByDistrict(String district) throws SQLException {
+        return nomineeManagement.getNomineesByDistrict(district);
+    }
    
+    
+    public Map<String, Integer> getPartyWiseVoteCount() throws SQLException {
+        return nomineeManagement.getPartyWiseVoteCount();
+    }
+
     public void deleteNominee(int nomineeId)
             throws IllegalArgumentException, SQLException {
 

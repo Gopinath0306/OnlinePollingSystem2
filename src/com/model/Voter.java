@@ -2,13 +2,7 @@ package com.model;
 
 import java.util.Date;
 
-/**
- * Model class representing a Voter entity.
- * Maps to the 'voter' table in the database.
- *
- * @author Senior Java Developer
- * @version 1.0
- */
+
 public class Voter {
 
   
