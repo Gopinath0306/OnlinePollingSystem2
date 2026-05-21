@@ -284,8 +284,10 @@ public class UserInterface {
         }
 
         try {
+        	Voter voter = voterService.searchVoterById(voterId);
             voterService.deleteVoter(voterId);
             ApplicationUtil.printSuccess("Voter ID '" + voterId + "' deleted successfully.");
+            System.out.println(voter);
         } catch (InvalidVoterException e) {
             ApplicationUtil.printError(e.getMessage());
         } catch (SQLException e) {
@@ -306,8 +308,9 @@ public class UserInterface {
             System.out.println("  1. Add Nominee");
             System.out.println("  2. Update Nominee Address");
             System.out.println("  3. Search Nominee By ID");
-            System.out.println("  4. Delete Nominee");
-            System.out.println("  5. Back to Main Menu");
+            System.out.println("  4.View nominees by district");
+            System.out.println("  5. Delete Nominee");
+            System.out.println("  6. Back to Main Menu");
             ApplicationUtil.printSeparator();
             System.out.print("  Enter your choice: ");
 
@@ -321,13 +324,16 @@ public class UserInterface {
                        break;
                 case 3: handleSearchNomineeById();      
                       break;
-                case 4: handleDeleteNominee();          
-                      break;
-                case 5: System.out.println("  Returning to main menu...");
+                case 4:
+                     handleViewNomineesByDistrict(); 
                      break;
-                default: ApplicationUtil.printError("Invalid option. Please enter 1–5.");
+                case 5: handleDeleteNominee();          
+                      break;
+                case 6: System.out.println("  Returning to main menu...");
+                     break;
+                default: ApplicationUtil.printError("Invalid option. Please enter 1–6.");
             }
-        } while (choice != 5);
+        } while (choice != 6);
     }
 
    
@@ -431,6 +437,30 @@ public class UserInterface {
             ApplicationUtil.printSuccess("Nominee ID " + nomineeId + " deleted successfully.");
         } catch (IllegalArgumentException e) {
             ApplicationUtil.printError(e.getMessage());
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Database error: " + e.getMessage());
+        }
+    }
+    
+    private static void handleViewNomineesByDistrict() {
+        System.out.println();
+        ApplicationUtil.printBanner("NOMINEES BY DISTRICT");
+
+        System.out.print("  Enter District Name: ");
+        String district = scanner.nextLine().trim();
+
+        try {
+            List<Nominee> nominees = nomineeService.getNomineesByDistrict(district);
+            if (nominees.isEmpty()) {
+                ApplicationUtil.printInfo("No nominees found in district: " + district);
+                return;
+            }
+            System.out.println("\n  Total Nominees in '" + district + "': " + nominees.size());
+            ApplicationUtil.printDivider();
+            for (int i = 0; i < nominees.size(); i++) {
+                System.out.println("  [" + (i + 1) + "]" + nominees.get(i));
+                ApplicationUtil.printDivider();
+            }
         } catch (SQLException e) {
             ApplicationUtil.printError("Database error: " + e.getMessage());
         }

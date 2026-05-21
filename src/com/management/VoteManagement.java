@@ -24,8 +24,7 @@ public class VoteManagement {
 
     
     public void insertVote(Vote vote) throws SQLException {
-        String sql = "INSERT INTO vote (vote_id, voter_id, nominee_id, vote_date) "
-                   + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO vote(vote_id, voter_id, nominee_id, vote_date) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, vote.getVoteId());
@@ -96,16 +95,12 @@ public class VoteManagement {
     
     public Map<String, Double> getDistrictVotingPercentage() throws SQLException {
         String sql =
-            "SELECT v.district, "
-          + "       COUNT(DISTINCT v.voter_id)  AS total_voters, "
-          + "       COUNT(DISTINCT vt.vote_id)  AS votes_cast, "
+            "SELECT v.district, COUNT(DISTINCT v.voter_id)  AS total_voters, COUNT(DISTINCT vt.vote_id)  AS votes_cast, "
           + "       CASE "
           + "           WHEN COUNT(DISTINCT v.voter_id) = 0 THEN 0.0 "
-          + "           ELSE ROUND((COUNT(DISTINCT vt.vote_id) * 100.0) "
-          + "                       / COUNT(DISTINCT v.voter_id), 2) "
+          + "           ELSE ROUND((COUNT(DISTINCT vt.vote_id) * 100.0) / COUNT(DISTINCT v.voter_id), 2) "
           + "       END AS percentage "
-          + "FROM voter v "
-          + "LEFT JOIN vote vt ON v.voter_id = vt.voter_id "
+          + "FROM voter v LEFT JOIN vote vt ON v.voter_id = vt.voter_id "
           + "GROUP BY v.district "
           + "ORDER BY percentage DESC";
 
@@ -124,11 +119,8 @@ public class VoteManagement {
 
     public Map<String, int[]> getDistrictVotingDetails() throws SQLException {
         String sql =
-            "SELECT v.district, "
-          + "       COUNT(DISTINCT v.voter_id) AS total_voters, "
-          + "       COUNT(DISTINCT vt.vote_id) AS votes_cast "
-          + "FROM voter v "
-          + "LEFT JOIN vote vt ON v.voter_id = vt.voter_id "
+            "SELECT v.district,  COUNT(DISTINCT v.voter_id) AS total_voters,  COUNT(DISTINCT vt.vote_id) AS votes_cast "
+          + "FROM voter v LEFT JOIN vote vt ON v.voter_id = vt.voter_id "
           + "GROUP BY v.district "
           + "ORDER BY v.district";
 

@@ -21,9 +21,7 @@ public class NomineeManagement {
     }
 
     public void insertNominee(Nominee nominee) throws SQLException {
-        String sql = "INSERT INTO nominee "
-                   + "(nominee_id, nominee_name, constitution, district, symbol, address, vote_count) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO nominee(nominee_id, nominee_name, constitution, district, symbol, address, vote_count) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, nominee.getNomineeId());
@@ -93,7 +91,7 @@ public class NomineeManagement {
   
     
     public List<Nominee> getAllNominees() throws SQLException {
-        String sql = "SELECT * FROM nominee ORDER BY district, vote_count DESC";
+        String sql = "SELECT * FROM nominee";
         List<Nominee> nominees = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -134,8 +132,7 @@ public class NomineeManagement {
     }
     
     public Map<String, Integer> getPartyWiseVoteCount() throws SQLException {
-        String sql = "SELECT symbol, SUM(vote_count) AS total_votes "
-                   + "FROM nominee GROUP BY symbol ORDER BY total_votes DESC";
+        String sql = "SELECT symbol, SUM(vote_count) AS total_votes FROM nominee GROUP BY symbol ORDER BY total_votes DESC";
         Map<String, Integer> partyVotes = new HashMap<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
