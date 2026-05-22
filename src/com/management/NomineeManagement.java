@@ -144,7 +144,26 @@ public class NomineeManagement {
         return partyVotes;
     }
     
-    
+    public List<Nominee> getWinningNomineesByConstitution() throws SQLException {
+        
+        String sql = "SELECT n.* FROM nominee n "
+                   + "INNER JOIN ( "
+                   + "    SELECT constitution, MAX(vote_count) AS max_votes "
+                   + "    FROM nominee "
+                   + "    GROUP BY constitution "
+                   + ") sub ON n.constitution = sub.constitution AND n.vote_count = sub.max_votes "
+                   + "ORDER BY n.constitution";
+
+        List<Nominee> winners = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                winners.add(mapResultSetToNominee(rs));
+            }
+        }
+        return winners;
+    }
     
     
     public void incrementVoteCount(int nomineeId) throws SQLException {

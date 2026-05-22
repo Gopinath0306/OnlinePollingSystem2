@@ -26,33 +26,64 @@ public class NomineeService {
     }
 
     
-    public Nominee addNominee(String nomineeName, String constitution,
-                              String district, String symbol, String address)
-            throws IllegalArgumentException, SQLException {
+//    public Nominee addNominee(String nomineeName, String constitution,
+//                              String district, String symbol, String address)
+//            throws IllegalArgumentException, SQLException {
+//
+//        
+//        if (ApplicationUtil.isNullOrBlank(nomineeName)) {
+//            throw new IllegalArgumentException("Nominee name cannot be empty.");
+//        }
+//        if (ApplicationUtil.isNullOrBlank(constitution)) {
+//            throw new IllegalArgumentException("Constitution cannot be empty.");
+//        }
+//        if (ApplicationUtil.isNullOrBlank(district)) {
+//            throw new IllegalArgumentException("District cannot be empty.");
+//        }
+//        if (ApplicationUtil.isNullOrBlank(symbol)) {
+//            throw new IllegalArgumentException("Party symbol cannot be empty.");
+//        }
+//
+//        
+//        int nomineeId = ApplicationUtil.generateNomineeId(connection);
+//
+//        
+//        Nominee nominee = new Nominee(nomineeId, nomineeName, constitution,
+//                                      district, symbol, address, 0);
+//
+//        nomineeManagement.insertNominee(nominee);
+//        return nominee;
+//    }
+    
+    public Nominee addNominee(String records) throws IllegalArgumentException, SQLException {
+    	String[] data=records.split(":");
+    	 int nomineeId = ApplicationUtil.generateNomineeId(connection);
+    	 
+    	 String nomineeName=data[0];
+    	 String constitution=data[1];
+    	 String district=data[2];
+    	 String symbol=data[3];
+    	 String address=data[4];
+    	 
+    	 if (ApplicationUtil.isNullOrBlank(nomineeName)) {
+           throw new IllegalArgumentException("Nominee name cannot be empty.");
+       }
+       if (ApplicationUtil.isNullOrBlank(constitution)) {
+           throw new IllegalArgumentException("Constitution cannot be empty.");
+       }
+       if (ApplicationUtil.isNullOrBlank(district)) {
+           throw new IllegalArgumentException("District cannot be empty.");
+       }
+       if (ApplicationUtil.isNullOrBlank(symbol)) {
+           throw new IllegalArgumentException("Party symbol cannot be empty.");
+       }
+       
+       Nominee nominee = new Nominee(nomineeId, nomineeName, constitution,
+             district, symbol, address, 0);
 
-        
-        if (ApplicationUtil.isNullOrBlank(nomineeName)) {
-            throw new IllegalArgumentException("Nominee name cannot be empty.");
-        }
-        if (ApplicationUtil.isNullOrBlank(constitution)) {
-            throw new IllegalArgumentException("Constitution cannot be empty.");
-        }
-        if (ApplicationUtil.isNullOrBlank(district)) {
-            throw new IllegalArgumentException("District cannot be empty.");
-        }
-        if (ApplicationUtil.isNullOrBlank(symbol)) {
-            throw new IllegalArgumentException("Party symbol cannot be empty.");
-        }
-
-        
-        int nomineeId = ApplicationUtil.generateNomineeId(connection);
-
-        
-        Nominee nominee = new Nominee(nomineeId, nomineeName, constitution,
-                                      district, symbol, address, 0);
-
-        nomineeManagement.insertNominee(nominee);
-        return nominee;
+           nomineeManagement.insertNominee(nominee);
+         return nominee;
+    	 
     }
 
    
@@ -106,5 +137,8 @@ public class NomineeService {
         nomineeManagement.deleteNominee(nomineeId);
     }
 
+    public List<Nominee> getWinningConstitution() throws SQLException {
+        return nomineeManagement.getWinningNomineesByConstitution();
+    }
  
 }

@@ -29,14 +29,13 @@ public class UserInterface {
     private static VoterService   voterService;
     private static NomineeService nomineeService;
     private static VoteService    voteService;
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+   
 
    
     public static void main(String[] args) {
        
        
-        try {
-           
+        try {          
             voterService   = new VoterService();
             nomineeService =new NomineeService();
             voteService    = new VoteService();
@@ -137,33 +136,38 @@ public class UserInterface {
         ApplicationUtil.printBanner("ADD VOTER");
 
         try {
-            System.out.print("  Enter Voter Name       : ");
-            String voterName = scanner.nextLine().trim();
-
-            System.out.print("  Enter Date of Birth    : (dd-MM-yyyy) ");
-            String dobStr = scanner.nextLine().trim();
-            Date dob = parseDate(dobStr);
-            if (dob == null) return;
-
-            System.out.print("  Enter Login ID         : ");
-            String loginId = scanner.nextLine().trim();
-
-            System.out.print("  Enter Password         : ");
-            String password = scanner.nextLine().trim();
-
-            System.out.print("  Enter Address          : ");
-            String address = scanner.nextLine().trim();
-
-            System.out.print("  Enter District         : ");
-            String district = scanner.nextLine().trim();
-
-            System.out.print("  Enter Mobile Number    : ");
-            long mobileNumber = scanner.nextLong();
-            scanner.nextLine();
+//            System.out.print("  Enter Voter Name       : ");
+//            String voterName = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter Date of Birth    : (dd-MM-yyyy) ");
+//            String dobStr = scanner.nextLine().trim();
+//            Date dob = parseDate(dobStr);
+//            if (dob == null) return;
+//
+//            System.out.print("  Enter Login ID         : ");
+//            String loginId = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter Password         : ");
+//            String password = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter Address          : ");
+//            String address = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter District         : ");
+//            String district = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter Mobile Number    : ");
+//            long mobileNumber = scanner.nextLong();
+//            scanner.nextLine();
+        	
+        	System.out.println("Enter voter details in the below format");
+        	System.out.println("VoterName:dob:LoginId:password:address:district:mobileNumber");
+        	String record=scanner.nextLine();
 
             
-            Voter newVoter = voterService.addVoter(voterName, dob, loginId,
-                                                    password, address, district, mobileNumber);
+//            Voter newVoter = voterService.addVoter(voterName, dob, loginId,
+//                                                    password, address, district, mobileNumber);
+        	Voter newVoter = voterService.addVoter(record);
 
             ApplicationUtil.printSuccess("Voter registered successfully!");
             System.out.println("  Generated Voter ID: " + newVoter.getVoterId());
@@ -348,22 +352,26 @@ public class UserInterface {
         ApplicationUtil.printBanner("ADD NOMINEE");
 
         try {
-            System.out.print("  Enter Nominee Name    : ");
-            String name = scanner.nextLine().trim();
+        	  System.out.println("Enter Nominee details in the below format");
+        	  System.out.println("Name:Constitution:District:symbol:address");
+        	  String record=scanner.nextLine();
+        	  
+//            System.out.print("  Enter Nominee Name    : ");
+//            String name = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter Constitution    : ");
+//            String constitution = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter District        : ");
+//            String district = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter Party Symbol    : ");
+//            String symbol = scanner.nextLine().trim();
+//
+//            System.out.print("  Enter Address         : ");
+//            String address = scanner.nextLine().trim();
 
-            System.out.print("  Enter Constitution    : ");
-            String constitution = scanner.nextLine().trim();
-
-            System.out.print("  Enter District        : ");
-            String district = scanner.nextLine().trim();
-
-            System.out.print("  Enter Party Symbol    : ");
-            String symbol = scanner.nextLine().trim();
-
-            System.out.print("  Enter Address         : ");
-            String address = scanner.nextLine().trim();
-
-            Nominee newNominee = nomineeService.addNominee(name, constitution, district, symbol, address);
+            Nominee newNominee = nomineeService.addNominee(record);
 
             ApplicationUtil.printSuccess("Nominee registered successfully!");
             System.out.println("  Generated Nominee ID: " + newNominee.getNomineeId());
@@ -612,7 +620,8 @@ public class UserInterface {
             System.out.println("  1. Voting Percentage By District");
             System.out.println("  2. Party Wise Vote Count");
             System.out.println("  3. District Wise Nominee List");
-            System.out.println("  4. Back to Main Menu");
+            System.out.println(" 4.Winning Constitution");
+            System.out.println("  5. Back to Main Menu");
             ApplicationUtil.printSeparator();
             System.out.print("  Enter your choice: ");
 
@@ -620,13 +629,19 @@ public class UserInterface {
             scanner.nextLine();
 
             switch (choice) {
-                case 1: handleDistrictVotingPercentage(); break;
-                case 2: handlePartyWiseVoteCount();       break;
-                case 3: handleDistrictWiseNomineeList();  break;
-                case 4: System.out.println("  Returning to main menu..."); break;
-                default: ApplicationUtil.printError("Invalid option. Please enter 1–4.");
+                case 1: handleDistrictVotingPercentage();
+                        break;
+                case 2: handlePartyWiseVoteCount();      
+                       break;
+                case 3: handleDistrictWiseNomineeList();  
+                       break;
+                case 4: handleWinningConstitution();    
+                      break;
+                case 5: System.out.println("  Returning to main menu...");
+                      break;
+                default: ApplicationUtil.printError("Invalid option. Please enter 1–5.");
             }
-        } while (choice != 4);
+        } while (choice != 5);
     }
    
     private static void handleDistrictVotingPercentage() {
@@ -728,13 +743,45 @@ public class UserInterface {
         }
     }
     
-    private static Date parseDate(String dateStr) {
-        DATE_FORMAT.setLenient(false);
+    private static void handleWinningConstitution() {
+        System.out.println();
+        ApplicationUtil.printBanner("WINNING CONSTITUTION RESULTS");
+
         try {
-            return DATE_FORMAT.parse(dateStr);
-        } catch (ParseException e) {
-            ApplicationUtil.printError("Invalid date format. Please use dd-MM-yyyy (e.g., 15-08-1990).");
-            return null;
+            List<Nominee> winners = nomineeService.getWinningConstitution();
+
+            if (winners.isEmpty()) {
+                ApplicationUtil.printInfo("No results available. No votes have been cast yet.");
+                return;
+            }
+
+            System.out.printf("%n  %-15s %-20s %-15s %-12s %-10s%n",
+                              "Constitution", "Winner Name", "District", "Symbol", "Votes");
+            ApplicationUtil.printDivider();
+
+            for (Nominee w : winners) {
+                System.out.printf("  %-15s %-20s %-15s %-12s %-10d%n",
+                                  w.getConstitution(), w.getNomineeName(),
+                                  w.getDistrict(), w.getSymbol(), w.getVoteCount());
+            }
+            ApplicationUtil.printDivider();
+            System.out.println("  * In case of a tie, both nominees are shown.");
+
+        } catch (SQLException e) {
+            ApplicationUtil.printError("Database error: " + e.getMessage());
         }
     }
+    
+    
+   
+    
+//    private static Date parseDate(String dateStr) {
+//        DATE_FORMAT.setLenient(false);
+//        try {
+//            return DATE_FORMAT.parse(dateStr);
+//        } catch (ParseException e) {
+//            ApplicationUtil.printError("Invalid date format. Please use dd-MM-yyyy (e.g., 15-08-1990).");
+//            return null;
+//        }
+//    }
 }
